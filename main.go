@@ -12,6 +12,7 @@ import (
 )
 
 func init() {
+	fmt.Println("Setting up configuration...")
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	viper.SetEnvPrefix("cacoo")
@@ -29,4 +30,5 @@ func main() {
 	mux.GET("/api/basicInfo", handlers.GetBasicInfo)
 	// http.ListenAndServe(":"+os.Getenv("PORT"), mux)
 	http.ListenAndServe(":8080", mux)
+	fmt.Println("Listening on port :8080")
 }

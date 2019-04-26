@@ -60,3 +60,17 @@ type Diagrams struct {
 	Result []Diagram `json:"result"`
 	Count  int       `json:"count"`
 }
+
+// Folder representation.
+type Folder struct {
+	FolderID   int    `json:"folderId"`
+	FolderName string `json:"folderName"`
+	Type       string `json:"type"`
+	Created    string `json:"created"`
+	Updated    string `json:"updated"`
+}
+
+// Folders representation.
+type Folders struct {
+	Result []Folder `json:"result"`
+}
