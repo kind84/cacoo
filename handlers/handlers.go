@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/kind84/cacoo/models"
+	"github.com/kind84/cacoo/repo"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -24,6 +25,8 @@ type cacooResp struct {
 	url   string
 	resp  *http.Response
 }
+
+var repository = repo.NewRedisRepo("127.0.0.1:6379")
 
 // GetUser returns user info
 func GetUser(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -91,6 +94,7 @@ func GetBasicInfo(w http.ResponseWriter, req *http.Request, _ httprouter.Params)
 			var mUsr models.User
 			dCoder.Decode(&mUsr)
 			fmt.Printf("Decoded user %v\n", mUsr)
+			repository.Save(fmt.Sprintf("user:%s", mUsr.Name), mUsr)
 			r.FullName = mUsr.Nickname
 			resCount++
 		case 1:

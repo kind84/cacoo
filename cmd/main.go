@@ -14,7 +14,7 @@ import (
 func init() {
 	fmt.Println("Setting up configuration...")
 	viper.SetConfigName("config")
-	viper.AddConfigPath(".")
+	viper.AddConfigPath("./..")
 	viper.SetEnvPrefix("cacoo")
 	viper.AutomaticEnv()
 
