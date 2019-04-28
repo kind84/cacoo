@@ -10,29 +10,29 @@ type User struct {
 
 // Diagram representation.
 type Diagram struct {
-	URL              string `json:"url"`
-	ImageURL         string `json:"imageUrl"`
-	ImageURLForAPI   string `json:"imageUrlForApi"`
-	DiagramID        string `json:"diagramId"`
-	Title            string `json:"title"`
-	Description      string `json:"description"`
-	Security         string `json:"security"`
-	Type             string `json:"type"`
-	OwnerName        string `json:"ownerName"`
-	OwnerNickname    string `json:"ownerNickname"`
-	Owner            User   `json:"owner"`
-	Editing          bool   `json:"editing"`
-	Own              bool   `json:"own"`
-	Shared           bool   `json:"shared"`
-	FolderID         int    `json:"folderId"`
-	FolderName       string `json:"folderName"`
-	ProjectID        string `json:"projectId"`
-	ProjectName      string `json:"projectName"`
-	OrganizationKey  string `json:"organizationKey"`
-	OrganizationName string `json:"organizationName"`
-	SheetCount       int    `json:"sheetCount"`
-	Created          string `json:"created"`
-	Updated          string `json:"updated"`
+	URL              string `json:"url" redis:"url"`
+	ImageURL         string `json:"imageUrl" redis:"imageUrl"`
+	ImageURLForAPI   string `json:"imageUrlForApi" redis:"imageUrlForApi"`
+	DiagramID        string `json:"diagramId" redis:"diagramId"`
+	Title            string `json:"title" redis:"title"`
+	Description      string `json:"description" redis:"description"`
+	Security         string `json:"security" redis:"security"`
+	Type             string `json:"type" redis:"type"`
+	OwnerName        string `json:"ownerName" redis:"ownerName"`
+	OwnerNickname    string `json:"ownerNickname" redis:"ownerNickname"`
+	Owner            User   `json:"owner" redis:"owner"`
+	Editing          bool   `json:"editing" redis:"editing"`
+	Own              bool   `json:"own" redis:"own"`
+	Shared           bool   `json:"shared" redis:"shared"`
+	FolderID         int    `json:"folderId" redis:"folderId"`
+	FolderName       string `json:"folderName" redis:"folderName"`
+	ProjectID        string `json:"projectId" redis:"projectId"`
+	ProjectName      string `json:"projectName" redis:"projectName"`
+	OrganizationKey  string `json:"organizationKey" redis:"organizationKey"`
+	OrganizationName string `json:"organizationName" redis:"organizationName"`
+	SheetCount       int    `json:"sheetCount" redis:"sheetCount"`
+	Created          string `json:"created" redis:"created"`
+	Updated          string `json:"updated" redis:"updated"`
 }
 
 // DiagramDetail representation.
