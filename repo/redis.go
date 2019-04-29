@@ -1,7 +1,6 @@
 package repo
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/gomodule/redigo/redis"
@@ -31,7 +30,7 @@ func (r RedisRepo) Save(k interface{}, v interface{}) {
 	defer conn.Close()
 
 	conn.Do("SET", k, v)
-	log.Printf("Inserted key %s with value: %v\n", k, v)
+	log.Printf("Inserted key %s\n", k)
 }
 
 // SaveSet creates/adds values to a set in Redis.
@@ -43,7 +42,7 @@ func (r RedisRepo) SaveSet(k interface{}, v ...interface{}) {
 	args = append(args, v...)
 	res, _ := conn.Do("SADD", args...)
 	if res != 0 {
-		log.Printf("Added values [%v] to set [%s]\n", v, k)
+		log.Printf("Values added to set [%s]\n", k)
 	}
 }
 
@@ -53,6 +52,5 @@ func (r RedisRepo) GetASet(k interface{}) []string {
 	defer conn.Close()
 
 	res, _ := redis.Strings(conn.Do("SMEMBERS", k))
-	fmt.Println(res)
 	return res
 }

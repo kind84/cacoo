@@ -29,16 +29,18 @@ func init() {
 
 func main() {
 	// Repository singleton.
-	Repo := repo.NewRedisRepo("127.0.0.1:6379")
+	rh := viper.GetString("redis_host")
+	Repo := repo.NewRedisRepo(rh)
+
 	Stower := stower.NewStower(Repo)
 
 	mux := httprouter.New()
 
-	mux.GET("/user", handlers.GetUser)
-	mux.GET("/api/basicInfo", handlers.GetBasicInfo(Repo, Stower))
+	mux.GET("/api/user", handlers.GetUser)
+	mux.GET("/api/info", handlers.GetBasicInfo(Repo, Stower))
 	mux.GET("/api/folder/:id", handlers.GetFolder(Repo))
+	mux.GET("/api/diagram/:id", handlers.GetDiagram)
 
 	fmt.Println("Listening on port :8080")
 	http.ListenAndServe(":8080", mux)
-	// http.ListenAndServe(":"+os.Getenv("PORT"), mux)
 }

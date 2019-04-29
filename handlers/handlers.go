@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/kind84/cacoo/stower"
 
@@ -31,7 +30,7 @@ type cacooResp struct {
 
 // GetUser returns user info
 func GetUser(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	resp, err := http.Get(fmt.Sprintf("https://cacoo.com/api/v1/users/%s.json", os.Getenv("USER_ID")))
+	resp, err := http.Get(fmt.Sprintf("https://cacoo.com/api/v1/users/%s.json", viper.Get("user_id")))
 	if err != nil {
 		panic(err)
 	}
@@ -41,10 +40,18 @@ func GetUser(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 	var u models.User
 	decoder.Decode(&u)
-	fmt.Println(u)
 
-	s := fmt.Sprintf("Hello %s", u.Nickname)
-	w.Write([]byte(s))
+	if u.Nickname != "" {
+		fmt.Printf("Hello %s\n", u.Nickname)
+	}
+
+	encoder := json.NewEncoder(w)
+	err = encoder.Encode(u)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"code": 500, "msg": "Error occurred while trying to serialize response."}`))
+		return
+	}
 }
 
 // GetBasicInfo for the current user.
@@ -100,7 +107,6 @@ func GetBasicInfo(repo interfaces.Repo, stow *stower.Stower) func(http.ResponseW
 			case 0:
 				var mUsr models.User
 				dCoder.Decode(&mUsr)
-				fmt.Printf("Decoded user %v\n", mUsr)
 
 				go repo.Save(fmt.Sprintf("user:%s", mUsr.Name), mUsr)
 
@@ -109,7 +115,6 @@ func GetBasicInfo(repo interfaces.Repo, stow *stower.Stower) func(http.ResponseW
 			case 1:
 				var mDgr models.Diagrams
 				dCoder.Decode(&mDgr)
-				fmt.Printf("Decoded diagrams %v\n", mDgr)
 
 				go stow.StowDgrams(mDgr.Result)
 
@@ -118,7 +123,7 @@ func GetBasicInfo(repo interfaces.Repo, stow *stower.Stower) func(http.ResponseW
 			case 2:
 				var mFold models.Folders
 				dCoder.Decode(&mFold)
-				fmt.Printf("Decoded folders %v\n", mFold)
+
 				for _, f := range mFold.Result {
 					resp.Folders = append(resp.Folders, struct {
 						ID   int    `json:"id"`
@@ -175,6 +180,36 @@ func GetFolder(repo interfaces.Repo) func(http.ResponseWriter, *http.Request, ht
 			w.Write([]byte(`{"code": 500, "msg": "Error occurred while trying to serialize response."}`))
 			return
 		}
+	}
+}
+
+// GetDiagram for the given diagram ID.
+func GetDiagram(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
+	id := p.ByName("id")
+
+	if id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"code": 400, "msg": "Bad Request. Missing diagram ID."}`))
+		return
+	}
+
+	resp, err := http.Get(fmt.Sprintf("https://cacoo.com/api/v1/diagrams/%s.json?apiKey=%s", id, viper.Get("api_key")))
+	if err != nil {
+		panic(err)
+	}
+
+	decoder := json.NewDecoder(resp.Body)
+	defer resp.Body.Close()
+
+	var dGram models.DiagramDetail
+	decoder.Decode(&dGram)
+
+	encoder := json.NewEncoder(w)
+	err = encoder.Encode(dGram)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"code": 500, "msg": "Error occurred while trying to serialize response."}`))
+		return
 	}
 }
 
