@@ -57,8 +57,6 @@ func GetUser(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 // GetBasicInfo for the current user.
 func GetBasicInfo(repo interfaces.Repo, stow *stower.Stower) func(http.ResponseWriter, *http.Request, httprouter.Params) {
 	return func(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-		// chUser := make(chan models.User)
-		// chDgrams := make(chan models.Diagrams)
 		fmt.Println("Retrieving basic info...")
 		requests := map[int]cacooReq{
 			0: {
