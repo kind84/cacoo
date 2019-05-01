@@ -5,7 +5,7 @@ Some API calls are made in parallel to show how to use this Go feature.
 
 ### Configuration:
 
-The application reads configuration from a __config.toml__ file placed in the root folder of the project. The file mut have the following structure:
+The application reads configuration from a __config.toml__ file placed in the root folder of the project. The file must have the following structure:
 
 ```toml
 user_id = "your-user-ID"
