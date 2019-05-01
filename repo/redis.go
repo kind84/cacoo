@@ -46,6 +46,15 @@ func (r RedisRepo) SaveSet(k interface{}, v ...interface{}) {
 	}
 }
 
+// Get an item from repository at the given key.
+func (r RedisRepo) Get(k interface{}) string {
+	conn := r.redis.Get()
+	defer conn.Close()
+
+	res, _ := redis.String(conn.Do("GET", k))
+	return res
+}
+
 // GetASet returns the set stored at the given key.
 func (r RedisRepo) GetASet(k interface{}) []string {
 	conn := r.redis.Get()

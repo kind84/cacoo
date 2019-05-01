@@ -4,5 +4,6 @@ package interfaces
 type Repo interface {
 	Save(interface{}, interface{})
 	SaveSet(interface{}, ...interface{})
+	Get(interface{}) string
 	GetASet(interface{}) []string
 }

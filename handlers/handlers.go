@@ -83,12 +83,13 @@ func GetBasicInfo(repo interfaces.Repo, stow *stower.Stower) func(http.ResponseW
 		}
 
 		var resp struct {
+			ID          string `json:"id"`
 			FullName    string `json:"full_name"`
 			TotDiagrams int    `json:"total_diagrams"`
 			Folders     []struct {
 				ID   int    `json:"id"`
 				Name string `json:"name"`
-			}
+			} `json:"folders"`
 		}
 
 		resCount := 0
@@ -108,6 +109,7 @@ func GetBasicInfo(repo interfaces.Repo, stow *stower.Stower) func(http.ResponseW
 
 				go repo.Save(fmt.Sprintf("user:%s", mUsr.Name), mUsr)
 
+				resp.ID = mUsr.Name
 				resp.FullName = mUsr.Nickname
 				resCount++
 			case 1:
@@ -122,11 +124,19 @@ func GetBasicInfo(repo interfaces.Repo, stow *stower.Stower) func(http.ResponseW
 				var mFold models.Folders
 				dCoder.Decode(&mFold)
 
+				resp.Folders = append(resp.Folders, struct {
+					ID   int    `json:"id"`
+					Name string `json:"name"`
+				}{ID: 0, Name: "Root"})
+
+				go repo.Save("fName:0", "Root")
+
 				for _, f := range mFold.Result {
 					resp.Folders = append(resp.Folders, struct {
 						ID   int    `json:"id"`
 						Name string `json:"name"`
 					}{ID: f.FolderID, Name: f.FolderName})
+					go repo.Save(fmt.Sprintf("fName:%d", f.FolderID), f.FolderName)
 				}
 				resCount++
 			}
@@ -151,23 +161,27 @@ func GetFolder(repo interfaces.Repo) func(http.ResponseWriter, *http.Request, ht
 	return func(w http.ResponseWriter, req *http.Request, p httprouter.Params) {
 		resp := struct {
 			ID       string           `json:"id"`
+			Name     string           `json:"name"`
 			Diagrams []models.Diagram `json:"diagrams"`
 		}{}
 
 		id := p.ByName("id")
 
 		if id != "" {
-			key := fmt.Sprintf("folder:%s", id)
-
-			dGramsStr := repo.GetASet(key)
+			fName := repo.Get(fmt.Sprintf("fName:%s", id))
+			dGramsStr := repo.GetASet(fmt.Sprintf("folder:%s", id))
 
 			var dGrams []models.Diagram
-			for _, dgStr := range dGramsStr {
-				var dGram models.Diagram
-				json.Unmarshal([]byte(dgStr), &dGram)
-				dGrams = append(dGrams, dGram)
+
+			if len(dGramsStr) > 0 {
+				for _, dgStr := range dGramsStr {
+					var dGram models.Diagram
+					json.Unmarshal([]byte(dgStr), &dGram)
+					dGrams = append(dGrams, dGram)
+				}
 			}
 			resp.ID = id
+			resp.Name = fName
 			resp.Diagrams = dGrams
 		}
 

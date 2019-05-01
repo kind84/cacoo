@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/rs/cors"
+
 	"github.com/julienschmidt/httprouter"
 
 	"github.com/spf13/viper"
@@ -41,6 +43,15 @@ func main() {
 	mux.GET("/api/folder/:id", handlers.GetFolder(Repo))
 	mux.GET("/api/diagram/:id", handlers.GetDiagram)
 
+	c := cors.New(cors.Options{
+		AllowCredentials: true,
+		AllowedHeaders:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST"},
+		AllowedOrigins:   []string{"*"},
+	})
+
+	handler := c.Handler(mux)
+
 	fmt.Println("Listening on port :8080")
-	http.ListenAndServe(":8080", mux)
+	http.ListenAndServe(":8080", handler)
 }
